@@ -7,11 +7,21 @@
 import sys, pygame #Remember: sudo apt-get install python-pygame
 pygame.init()
 
-
 #Create a window.
 size = width, height = 600, 400
+manWidth  = 95
+manHeight = 161
 screen = pygame.display.set_mode(size)
 
+class Dimension(object):
+	'''A class that models the vertical and horizontal dimensions,
+	keeping track of which way we're going and allowing us to flip.'''
+	def __init__(self):
+		self.unit = 1
+	def flip(self):
+		self.unit *= -1
+
+vertical, horizontal = Dimension(), Dimension()
 
 print '''
 Welcome to my game. 
@@ -47,11 +57,17 @@ while 1: #Forever loop.
 	pygame.display.flip() #Redraws the screen.
 	
 	#Change horizontal and vertical coordinates so that the image moves.
-	x += 1
-	y += 1
-	
-	
+	for position, screenBound, manSize, dimension in (
+		(x, width,  manWidth,  horizontal),
+		(y, height, manHeight, vertical)):
+		# in each dimension, change direction if the man
+		# is about to leave the screen
+		if position + manSize >= screenBound or \
+			 position < 0:
+			dimension.flip()
 
+	x += horizontal.unit
+	y += vertical.unit
 
 #backup plan for exiting
 raw_input ('Press Enter key to exit.')
